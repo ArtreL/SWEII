@@ -58,12 +58,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Layers\BusinessLayer.cs" />
+    <Compile Include="Layers\DataAccessLayer.cs" />
+    <Compile Include="Models\CameraModel.cs" />
+    <Compile Include="Models\EXIFModel.cs" />
+    <Compile Include="Models\IPTCModel.cs" />
+    <Compile Include="Models\PhotographerModel.cs" />
+    <Compile Include="Models\PictureModel.cs" />
     <Compile Include="Uebungen\UEB3.cs" />
     <Compile Include="Uebungen\UEB4.cs" />
     <Compile Include="Uebungen\UEB5.cs" />
     <Compile Include="Uebungen\UEB6.cs" />
     <Compile Include="Uebungen\UEB2.cs" />
     <Compile Include="Uebungen\UEB1.cs" />
+    <Compile Include="ViewModels\CameraListViewModel.cs" />
+    <Compile Include="ViewModels\CameraViewModel.cs" />
+    <Compile Include="ViewModels\EXIFViewModel.cs" />
+    <Compile Include="ViewModels\IPTCViewModel.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\PhotographerListViewModel.cs" />
+    <Compile Include="ViewModels\PhotographerViewModel.cs" />
+    <Compile Include="ViewModels\PictureListViewModel.cs" />
+    <Compile Include="ViewModels\PictureViewModel.cs" />
+    <Compile Include="ViewModels\SearchViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -101,6 +118,13 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BIF-SWE2\CS\BIF-SWE2.UnitTests\BIF-SWE2.UnitTests.csproj">
+      <Project>{6b6f4cdb-461c-4c8d-a5d5-bc2bdbc57d99}</Project>
+      <Name>BIF-SWE2.UnitTests</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
