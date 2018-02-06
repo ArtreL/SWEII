@@ -10,10 +10,10 @@ namespace PicDB.ViewModels
     {
         public int ID => throw new NotImplementedException();
 
-        public string FirstName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string LastName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime? BirthDay { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Notes { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime? BirthDay { get; set; }
+        public string Notes { get; set; }
 
         public int NumberOfPictures => throw new NotImplementedException();
 

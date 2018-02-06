@@ -8,10 +8,10 @@ namespace PicDB.Models
 {
     class PictureModel : IPictureModel
     {
-        public int ID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string FileName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IIPTCModel IPTC { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public IEXIFModel EXIF { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ICameraModel Camera { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int ID { get; set; }
+        public string FileName { get; set; }
+        public IIPTCModel IPTC { get; set; }
+        public IEXIFModel EXIF { get; set; }
+        public ICameraModel Camera { get; set; }
     }
 }

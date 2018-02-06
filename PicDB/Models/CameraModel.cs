@@ -8,12 +8,12 @@ namespace PicDB.Models
 {
     class CameraModel : ICameraModel
     {
-        public int ID { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Producer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Make { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime? BoughtOn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Notes { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal ISOLimitGood { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal ISOLimitAcceptable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int ID { get; set; }
+        public string Producer { get; set; }
+        public string Make { get; set; }
+        public DateTime? BoughtOn { get; set; }
+        public string Notes { get; set; }
+        public decimal ISOLimitGood { get; set; }
+        public decimal ISOLimitAcceptable { get; set; }
     }
 }

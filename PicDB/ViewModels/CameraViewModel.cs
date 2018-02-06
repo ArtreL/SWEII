@@ -4,32 +4,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BIF.SWE2.Interfaces;
+using BIF.SWE2.Interfaces.Models;
 
 namespace PicDB.ViewModels
 {
     public class CameraViewModel : ICameraViewModel
     {
-        public int ID => throw new NotImplementedException();
+        public CameraViewModel(ICameraModel camera)
+        {
+            if (camera != null)
+            {
+                ID = camera.ID;
+                Producer = camera.Producer;
+                Make = camera.Make;
+                BoughtOn = camera.BoughtOn;
+                Notes = camera.Notes;
+                ISOLimitGood = camera.ISOLimitGood;
+                ISOLimitAcceptable = camera.ISOLimitAcceptable;
+            }
+        }
 
-        public string Producer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Make { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public DateTime? BoughtOn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string Notes { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public CameraViewModel()
+        {
+        }
 
-        public int NumberOfPictures => throw new NotImplementedException();
-
-        public bool IsValid => throw new NotImplementedException();
-
-        public string ValidationSummary => throw new NotImplementedException();
-
-        public bool IsValidProducer => throw new NotImplementedException();
-
-        public bool IsValidMake => throw new NotImplementedException();
-
-        public bool IsValidBoughtOn => throw new NotImplementedException();
-
-        public decimal ISOLimitGood { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public decimal ISOLimitAcceptable { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int ID { get; set; }
+        public string Producer { get; set; }
+        public string Make { get; set; }
+        public DateTime? BoughtOn { get; set; }
+        public string Notes { get; set; }
+        public int NumberOfPictures { get; set; }
+        public bool IsValid { get; set; }
+        public string ValidationSummary { get; set; }
+        public bool IsValidProducer { get; set; }
+        public bool IsValidMake { get; set; }
+        public bool IsValidBoughtOn { get; set; }
+        public decimal ISOLimitGood { get; set; }
+        public decimal ISOLimitAcceptable { get; set; }
 
         public ISORatings TranslateISORating(decimal iso)
         {

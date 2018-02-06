@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BIF.SWE2.Interfaces.Models;
+using System.Data.SqlClient;
 
 namespace PicDB.Layers
 {
@@ -12,6 +13,25 @@ namespace PicDB.Layers
         public void DeletePhotographer(int ID)
         {
             throw new NotImplementedException();
+
+            using (SqlConnection db = new SqlConnection(@"Data Source=(local); Initial Catalog=PicDB; Integrated Security=true;"))
+            {
+                db.Open();
+
+                var sqlString = string.Format("P_SELECT_Genre_AllNames @GenreList");
+                SqlCommand query = new SqlCommand(sqlString, db);
+                //query.Parameters.AddWithValue("@GenreList", genrelist);
+
+                using (SqlDataReader rd = query.ExecuteReader())
+                {
+                    while (rd.Read())
+                    {
+                        //outfeed += rd.GetString(0);
+                    }
+                }
+
+                db.Close();
+            }
         }
 
         public void DeletePicture(int ID)
