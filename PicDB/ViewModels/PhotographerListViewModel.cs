@@ -8,8 +8,8 @@ namespace PicDB.ViewModels
 {
     class PhotographerListViewModel : IPhotographerListViewModel
     {
-        public IEnumerable<IPhotographerViewModel> List => throw new NotImplementedException();
+        public IEnumerable<IPhotographerViewModel> List { get; set; }
 
-        public IPhotographerViewModel CurrentPhotographer => throw new NotImplementedException();
+        public IPhotographerViewModel CurrentPhotographer { get; set; }
     }
 }

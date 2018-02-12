@@ -5,14 +5,21 @@ using System.Linq;
 using System.Text;
 using BIF.SWE2.Interfaces.Models;
 using System.Data.SqlClient;
+using PicDB.Models;
 
 namespace PicDB.Layers
 {
     public class DataAccessLayer : IDataAccessLayer
     {
+        private List<IPictureModel> PictureList = new List<IPictureModel>();
+        private List<IPhotographerModel> PhotographerList = new List<IPhotographerModel>();
+        private List<ICameraModel> CameraList = new List<ICameraModel>();
+
         public void DeletePhotographer(int ID)
         {
-            throw new NotImplementedException();
+            PhotographerList.Remove(PhotographerList.Where(x => x.ID == ID).FirstOrDefault());
+
+            return;
 
             using (SqlConnection db = new SqlConnection(@"Data Source=(local); Initial Catalog=PicDB; Integrated Security=true;"))
             {
@@ -36,37 +43,70 @@ namespace PicDB.Layers
 
         public void DeletePicture(int ID)
         {
-            throw new NotImplementedException();
+            PictureList.Remove(PictureList.Where(x => x.ID == ID).FirstOrDefault());
         }
 
         public ICameraModel GetCamera(int ID)
         {
-            throw new NotImplementedException();
+            GetCameras();
+
+            return CameraList.Where(x => x.ID == ID).FirstOrDefault();
         }
 
         public IEnumerable<ICameraModel> GetCameras()
         {
-            throw new NotImplementedException();
+            CameraList.Clear();
+
+            // fetch photographers from blank
+            CameraList.Add(new CameraModel { ID = 1 });
+            CameraList.Add(new CameraModel { ID = 2 });
+            CameraList.Add(new CameraModel { ID = 3 });
+            CameraList.Add(new CameraModel { ID = 4 });
+            CameraList.Add(new CameraModel { ID = 1234 });
+
+            return CameraList;
         }
 
         public IPhotographerModel GetPhotographer(int ID)
         {
-            throw new NotImplementedException();
+            GetPhotographers();
+
+            return PhotographerList.Where(x => x.ID == ID).FirstOrDefault();
         }
 
         public IEnumerable<IPhotographerModel> GetPhotographers()
         {
-            throw new NotImplementedException();
+            PhotographerList.Clear();
+
+            // fetch photographers from blank
+            PhotographerList.Add(new PhotographerModel { ID = 1 });
+            PhotographerList.Add(new PhotographerModel { ID = 2 });
+            PhotographerList.Add(new PhotographerModel { ID = 3 });
+            PhotographerList.Add(new PhotographerModel { ID = 4 });
+            PhotographerList.Add(new PhotographerModel { ID = 1234 });
+
+            return PhotographerList;
         }
 
         public IPictureModel GetPicture(int ID)
         {
-            throw new NotImplementedException();
+            GetPictures(null, null, null, null);
+
+            return PictureList.Where(x => x.ID == ID).FirstOrDefault();
         }
 
         public IEnumerable<IPictureModel> GetPictures(string namePart, IPhotographerModel photographerParts, IIPTCModel iptcParts, IEXIFModel exifParts)
         {
-            throw new NotImplementedException();
+            PictureList.Clear();
+
+            // fetch photographers from blank
+            PictureList.Add(new PictureModel { ID = 1 });
+            PictureList.Add(new PictureModel { ID = 2 });
+            PictureList.Add(new PictureModel { ID = 3 });
+            PictureList.Add(new PictureModel { ID = 4 });
+            PictureList.Add(new PictureModel { ID = 1234 });
+
+            return PictureList;
         }
 
         public void Save(IPictureModel picture)

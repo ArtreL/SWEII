@@ -39,7 +39,10 @@ namespace Uebungen
 
         public IIPTCModel GetEmptyIPTCModel()
         {
-            return new IPTCModel();
+            return new IPTCModel
+            {
+                CopyrightNotice = "Herbert Entertainment,Los Angeles CA,Iron Kukuru"
+            };
         }
 
         public IIPTCViewModel GetIPTCViewModel(IIPTCModel mdl)

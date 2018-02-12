@@ -12,30 +12,56 @@ namespace PicDB.ViewModels
     {
         public EXIFViewModel(IEXIFModel exif)
         {
+            if (exif != null)
+            {
+                Make = exif.Make;
+                FNumber = exif.FNumber;
+                ExposureTime = exif.ExposureTime;
+                ISOValue = exif.ISOValue;
+                Flash = exif.Flash;
+                ExposureProgram = exif.ExposureProgram.ToString();
+                ExposureProgramResource = "Hugo";
+            }
         }
 
         public EXIFViewModel()
         {
         }
 
-        public string Make => throw new NotImplementedException();
+        public string Make { get; set; }
+        public decimal FNumber { get; set; }
+        public decimal ExposureTime { get; set; }
+        private decimal _ISOValue;
+        public decimal ISOValue
+        {
+            get { return _ISOValue; }
+            set
+            {
+                if (value > 800)
+                {
+                    ISORating = (ISORatings)3;
+                }
+                else if(value > 400)
+                {
+                    ISORating = (ISORatings)2;
+                }
+                else if (value > 0)
+                {
+                    ISORating = (ISORatings)1;
+                }
+                else
+                {
+                    ISORating = (ISORatings)0;
+                }
 
-        public decimal FNumber => throw new NotImplementedException();
-
-        public decimal ExposureTime => throw new NotImplementedException();
-
-        public decimal ISOValue => throw new NotImplementedException();
-
-        public bool Flash => throw new NotImplementedException();
-
-        public string ExposureProgram => throw new NotImplementedException();
-
-        public string ExposureProgramResource => throw new NotImplementedException();
-
+                _ISOValue = value;
+            }
+        }
+        public bool Flash { get; set; }
+        public string ExposureProgram { get; set; }
+        public string ExposureProgramResource { get; set; }
         public ICameraViewModel Camera { get; set; }
-
-        public ISORatings ISORating => throw new NotImplementedException();
-
-        public string ISORatingResource => throw new NotImplementedException();
+        public ISORatings ISORating { get; set; }
+        public string ISORatingResource { get; set; }
     }
 }

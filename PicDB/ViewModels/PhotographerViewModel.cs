@@ -1,4 +1,5 @@
-﻿using BIF.SWE2.Interfaces.ViewModels;
+﻿using BIF.SWE2.Interfaces.Models;
+using BIF.SWE2.Interfaces.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +9,79 @@ namespace PicDB.ViewModels
 {
     class PhotographerViewModel : IPhotographerViewModel
     {
-        public int ID => throw new NotImplementedException();
+        public PhotographerViewModel(IPhotographerModel photographer)
+        {
+            FirstName = photographer.FirstName;
+            LastName = photographer.LastName;
+            BirthDay = photographer.BirthDay;
+            Notes = photographer.Notes;
+        }
+
+        public PhotographerViewModel()
+        {
+        }
+
+        public int ID { get; set; }
 
         public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime? BirthDay { get; set; }
+        private string _LastName;
+        public string LastName
+        {
+            get { return _LastName; }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    IsValidLastName = true;
+                    ValidationSummary = ValidationSummary?.Replace("ERROR: Last name is not valid,", "");
+                }
+                else
+                {
+                    IsValidLastName = false;
+                    ValidationSummary += "ERROR: Last name is not valid,";
+                }
+
+                _LastName = value;
+            }
+        }
+        private DateTime? _BirthDay;
+        public DateTime? BirthDay
+        {
+            get { return _BirthDay; }
+            set
+            {
+                if ((value <= DateTime.Today) || (value == null))
+                {
+                    IsValidBirthDay = true;
+                    ValidationSummary = ValidationSummary?.Replace("ERROR: Birthday is not valid,", "");
+                }
+                else
+                {
+                    IsValidBirthDay = false;
+                    ValidationSummary += "ERROR: Birthday is not valid,";
+                }
+
+                _BirthDay = value;
+            }
+        }
         public string Notes { get; set; }
+        public int NumberOfPictures { get; set; }
+        private bool _IsValid;
+        public bool IsValid
+        {
+            get
+            {
+                if (IsValidLastName && IsValidBirthDay)
+                {
+                    _IsValid = true;
+                }
 
-        public int NumberOfPictures => throw new NotImplementedException();
-
-        public bool IsValid => throw new NotImplementedException();
-
-        public string ValidationSummary => throw new NotImplementedException();
-
-        public bool IsValidLastName => throw new NotImplementedException();
-
-        public bool IsValidBirthDay => throw new NotImplementedException();
+                return _IsValid;
+            }
+            set { _IsValid = value; }
+        }
+        public string ValidationSummary { get; set; }
+        public bool IsValidLastName { get; set; }
+        public bool IsValidBirthDay { get; set; }
     }
 }

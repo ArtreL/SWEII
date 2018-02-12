@@ -40,15 +40,7 @@ namespace PicDB.Layers
 
         public IEXIFModel ExtractEXIF(string filename)
         {
-            IEXIFModel retEXIF = new EXIFModel
-            {
-                Make = "Lorem",
-                FNumber = 1,
-                ExposureTime = 1,
-                ISOValue = 1,
-                Flash = true
-            };
-
+            bool filefound = false;
             string[] files = new string[] { };
             files = Directory.GetFileSystemEntries(folderpath);
 
@@ -63,15 +55,59 @@ namespace PicDB.Layers
 
                 if (realname.ToLower().Contains(filename.ToLower()))
                 {
+                    filefound = true;
                 }
             }
 
-            return retEXIF;
+            if(!filefound)
+            {
+                throw new FileNotFoundException();
+            }
+
+            return new EXIFModel
+            {
+                Make = "Lorem",
+                FNumber = 1,
+                ExposureTime = 1,
+                ISOValue = 1,
+                Flash = true
+            };
         }
 
         public IIPTCModel ExtractIPTC(string filename)
         {
-            throw new NotImplementedException();
+            bool filefound = false;
+            string[] files = new string[] { };
+            files = Directory.GetFileSystemEntries(folderpath);
+
+            if (filename == null)
+            {
+                filename = "";
+            }
+
+            foreach (var file in files)
+            {
+                string realname = file.Split('\\').Last();
+
+                if (realname.ToLower().Contains(filename.ToLower()))
+                {
+                    filefound = true;
+                }
+            }
+
+            if (!filefound)
+            {
+                throw new FileNotFoundException();
+            }
+
+            return new IPTCModel
+            {
+                ByLine = "Lorem",
+                Caption = "Ipsum",
+                CopyrightNotice = "Dolor",
+                Headline = "Sit",
+                Keywords = "Amet"
+            };
         }
 
         public ICameraModel GetCamera(int cam_id)
@@ -137,45 +173,65 @@ namespace PicDB.Layers
 
         public IEnumerable<IPictureModel> GetPictures(string namePart, IPhotographerModel photographerParts, IIPTCModel iptcParts, IEXIFModel exifParts)
         {
-            List<IPictureModel> retPics = new List<IPictureModel>();
-
-            string[] files = new string[] { };
-            files = Directory.GetFileSystemEntries(folderpath);
-            string filename = "";
+            Sync();
 
             if (namePart == null)
             {
                 namePart = "";
             }
 
-            foreach (var file in files)
-            {
-                filename = file.Split('\\').Last();
+            IEnumerable<IPictureModel> retEnum = PictureList.Where(x => x.FileName.ToLower().Contains(namePart.ToLower()));
 
-                if (filename.ToLower().Contains(namePart.ToLower()))
-                {
-                    retPics.Add(new PictureModel
-                    {
-                        ID = 0,
-                        FileName = filename,
-                        IPTC = null,
-                        EXIF = null,
-                        Camera = null
-                    });
-                }
+            if(retEnum.Count() == 0)
+            {
+                retEnum = new List<IPictureModel> { new PictureModel() };
             }
 
-            return retPics;
+            return retEnum;
         }
 
         public void Save(IPictureModel picture)
         {
-            throw new NotImplementedException();
+            Sync();
+
+            if (PictureList.Count > 0)
+            {
+                for (int i = 1; ; ++i)
+                {
+                    if (PictureList.Where(x => x.ID == i).FirstOrDefault() == null)
+                    {
+                        picture.ID = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                picture.ID = 1;
+            }
+
+            PictureList.Add(picture);
         }
 
         public void Save(IPhotographerModel photographer)
         {
-            throw new NotImplementedException();
+            if (PhotographerList.Count > 0)
+            {
+                for (int i = 1; ; ++i)
+                {
+                    if (PhotographerList.Where(x => x.ID == i).FirstOrDefault() == null)
+                    {
+                        photographer.ID = i;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                photographer.ID = 1;
+            }
+
+            PhotographerList.Add(photographer);
         }
 
         public void Sync()
@@ -308,23 +364,26 @@ namespace PicDB.Layers
                 //var metadata = decoder.Frames[0].Metadata as BitmapMetadata;
                 #endregion
 
-                PictureList.Add(new PictureModel
+                if (PictureList.Where(x => x.FileName == file.Split('\\').Last()).FirstOrDefault() == null)
                 {
-                    ID = id_runindex,
-                    FileName = file.Split('\\').Last(),
-                    IPTC = null,
-                    EXIF = new EXIFModel
+                    PictureList.Add(new PictureModel
                     {
-                        Make = exifmake,
-                        FNumber = exiffnumber,
-                        ExposureTime = exifexposuretime,
-                        ISOValue = exifisovalue,
-                        Flash = exifflash,
-                        ExposureProgram = (ExposurePrograms)exifexposureprogram
-                        
-                    },
-                    Camera = null
-                });
+                        ID = id_runindex,
+                        FileName = file.Split('\\').Last(),
+                        IPTC = null,
+                        EXIF = new EXIFModel
+                        {
+                            Make = exifmake,
+                            FNumber = exiffnumber,
+                            ExposureTime = exifexposuretime,
+                            ISOValue = exifisovalue,
+                            Flash = exifflash,
+                            ExposureProgram = (ExposurePrograms)exifexposureprogram
+
+                        },
+                        Camera = null
+                    });
+                }
 
                 ++id_runindex;
             }
