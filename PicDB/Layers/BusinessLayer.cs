@@ -9,7 +9,7 @@ using System.Reflection;
 using PicDB.Models;
 using System.Drawing.Imaging;
 using System.Drawing;
-using System.Windows.Media.Imaging;
+using System.Data.SqlClient;
 
 namespace PicDB.Layers
 {
@@ -239,10 +239,13 @@ namespace PicDB.Layers
             string[] files = new string[] { };
 
             files = Directory.GetFileSystemEntries(folderpath);
-            int id_runindex = 1;
-
+            
             foreach (var file in files)
             {
+                string filename_split = file.Split('\\').Last();
+                int pic_id = 0;
+                string sql_error = null;
+
                 #region Extract EXIF
                 Image SaveImage = null;
 
@@ -364,12 +367,76 @@ namespace PicDB.Layers
                 //var metadata = decoder.Frames[0].Metadata as BitmapMetadata;
                 #endregion
 
-                if (PictureList.Where(x => x.FileName == file.Split('\\').Last()).FirstOrDefault() == null)
+                using (SqlConnection db = new SqlConnection(@"Data Source=(local); Initial Catalog=PicDB; Integrated Security=true;"))
+                {
+                    int exif_id = 0;
+
+                    db.Open();
+
+                    SqlCommand query = new SqlCommand(@"P_INSERT_EXIF @Make, @FNumber, @ExposureTime, @Flash, @ExposureProgram", db);
+
+                    query.Parameters.AddWithValue("@Make", exifmake);
+                    query.Parameters.AddWithValue("@FNumber", exiffnumber);
+                    query.Parameters.AddWithValue("@ExposureTime", exifexposuretime);
+                    query.Parameters.AddWithValue("@Flash", exifflash);
+                    query.Parameters.AddWithValue("@ExposureProgram", exifexposureprogram);
+
+                    query.ExecuteNonQuery();
+
+                    using (SqlDataReader rd = query.ExecuteReader())
+                    {
+                        while (rd.Read())
+                        {
+                            try
+                            {
+                                exif_id = rd.GetInt32(0);
+                            }
+                            catch
+                            {
+                                sql_error = rd.GetString(0);
+                            }
+                        }
+                    }
+
+                    db.Close();
+                    db.Open();
+
+                    query = new SqlCommand(@"P_INSERT_Picture @FileName, @PhotogId, @CameraId, @EXIFId, @IPTCId", db);
+
+                    Random rnd = new Random();
+
+                    query.Parameters.AddWithValue("@FileName", filename_split);
+                    query.Parameters.AddWithValue("@PhotogId", rnd.Next(1, 4));
+                    query.Parameters.AddWithValue("@CameraId", rnd.Next(1, 4));
+                    query.Parameters.AddWithValue("@EXIFId", exif_id);
+                    query.Parameters.AddWithValue("@IPTCId", 0);
+
+                    query.ExecuteNonQuery();
+
+                    using (SqlDataReader rd = query.ExecuteReader())
+                    {
+                        while (rd.Read())
+                        {
+                            try
+                            {
+                                pic_id = rd.GetInt32(0);
+                            }
+                            catch
+                            {
+                                sql_error = rd.GetString(0);
+                            }
+                        }
+                    }
+
+                    db.Close();
+                }
+
+                if (PictureList.Where(x => x.FileName == filename_split).FirstOrDefault() == null)
                 {
                     PictureList.Add(new PictureModel
                     {
-                        ID = id_runindex,
-                        FileName = file.Split('\\').Last(),
+                        ID = pic_id,
+                        FileName = filename_split,
                         IPTC = null,
                         EXIF = new EXIFModel
                         {
@@ -379,13 +446,10 @@ namespace PicDB.Layers
                             ISOValue = exifisovalue,
                             Flash = exifflash,
                             ExposureProgram = (ExposurePrograms)exifexposureprogram
-
                         },
                         Camera = null
                     });
                 }
-
-                ++id_runindex;
             }
         }
 
