@@ -10,6 +10,7 @@ using PicDB.Models;
 using System.Drawing.Imaging;
 using System.Drawing;
 using System.Data.SqlClient;
+using System.Drawing.Drawing2D;
 
 namespace PicDB.Layers
 {
@@ -59,7 +60,7 @@ namespace PicDB.Layers
                 }
             }
 
-            if(!filefound)
+            if (!filefound)
             {
                 throw new FileNotFoundException();
             }
@@ -182,7 +183,7 @@ namespace PicDB.Layers
 
             IEnumerable<IPictureModel> retEnum = PictureList.Where(x => x.FileName.ToLower().Contains(namePart.ToLower()));
 
-            if(retEnum.Count() == 0)
+            if (retEnum.Count() == 0)
             {
                 retEnum = new List<IPictureModel> { new PictureModel() };
             }
@@ -239,7 +240,7 @@ namespace PicDB.Layers
             string[] files = new string[] { };
 
             files = Directory.GetFileSystemEntries(folderpath);
-            
+
             foreach (var file in files)
             {
                 string filename_split = file.Split('\\').Last();
@@ -430,6 +431,36 @@ namespace PicDB.Layers
 
                     db.Close();
                 }
+
+                #region Create Thumbnail
+                if (!File.Exists(file.Replace("\\Pictures\\", "\\Thumbnails\\")))
+                {
+                    Image image = new Bitmap(file);
+                    int width = 180;
+                    int height = 180;
+                    var destRect = new Rectangle(0, 0, width, height);
+                    var destImage = new Bitmap(width, height);
+
+                    destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+                    using (var graphics = Graphics.FromImage(destImage))
+                    {
+                        graphics.CompositingMode = CompositingMode.SourceCopy;
+                        graphics.CompositingQuality = CompositingQuality.HighQuality;
+                        graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        graphics.SmoothingMode = SmoothingMode.HighQuality;
+                        graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                        using (var wrapMode = new ImageAttributes())
+                        {
+                            wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                            graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                        }
+                    }
+
+                    destImage.Save(file.Replace("\\Pictures\\", "\\Thumbnails\\"), ImageFormat.Png);
+                }
+                #endregion
 
                 if (PictureList.Where(x => x.FileName == filename_split).FirstOrDefault() == null)
                 {

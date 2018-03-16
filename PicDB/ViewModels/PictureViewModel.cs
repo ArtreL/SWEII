@@ -16,6 +16,7 @@ namespace PicDB.ViewModels
         {
             FileName = pic.FileName;
             FilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Pictures\\" + pic.FileName;
+            Thumbnail = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Thumbnails\\" + pic.FileName;
             IPTC = new IPTCViewModel(pic.IPTC);
             EXIF = new EXIFViewModel(pic.EXIF);
             Photographer = null;
@@ -30,6 +31,7 @@ namespace PicDB.ViewModels
         public int ID { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
+        public string Thumbnail { get; set; }
         public string DisplayName { get; set; }
         public IIPTCViewModel IPTC { get; set; }
         public IEXIFViewModel EXIF { get; set; }

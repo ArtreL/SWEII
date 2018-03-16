@@ -1,8 +1,12 @@
 ﻿<Application x:Class="PicDB.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:view="clr-namespace:PicDB"
+             xmlns:vm="clr-namespace:PicDB.ViewModels"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <DataTemplate DataType="{x:Type vm:PictureListViewModel}">
+            <view:PictureList />
+        </DataTemplate>
     </Application.Resources>
 </Application>

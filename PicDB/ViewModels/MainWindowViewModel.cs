@@ -1,34 +1,64 @@
 ﻿using BIF.SWE2.Interfaces.ViewModels;
 using PicDB.Layers;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Windows;
 
 namespace PicDB.ViewModels
 {
-    public class MainWindowViewModel : IMainWindowViewModel
+    public class MainWindowViewModel : ViewModel, IMainWindowViewModel
     {
         public MainWindowViewModel()
         {
             BL.Sync();
+            _List = new PictureListViewModel();
+            CurrentPicture = List.List.First();
         }
 
-        public IPictureViewModel CurrentPicture => new PictureViewModel();
-        public IPictureListViewModel List => new PictureListViewModel();
+        public static BusinessLayer BL = new BusinessLayer();
+
+        private IPictureViewModel _CurrentPicture;
+        public IPictureViewModel CurrentPicture
+        {
+            get { return _CurrentPicture; }
+            set
+            {
+                if(_CurrentPicture != value)
+                {
+                    _CurrentPicture = value;
+                    OnPropertyChanged("CurrentPicture");
+                }
+            }
+        }
+
+        private IPictureListViewModel _List;
+        public IPictureListViewModel List => _List;
         public ISearchViewModel Search => new SearchViewModel();
-        public BusinessLayer BL = new BusinessLayer();
 
         public string SearchIcon
         {
             get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Icons\\search.png"; }
         }
 
-        public string ImageDisplay
+        private ICommandViewModel _ChoosePicture;
+        public ICommandViewModel ChoosePicture
         {
-            get { return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Pictures\\Img1.jpg"; }
+            get
+            {
+                if (_ChoosePicture == null)
+                {
+                    _ChoosePicture = new SimpleParameterCommandViewModel<string>(
+                        "Choose Picture",
+                        "Choose a picture to display in the main window of the application.",
+                        (string Param) =>
+                        {
+                            CurrentPicture = List.List.Where(x => x.FileName == Param).FirstOrDefault();
+                        },
+                        () => true);
+                }
+                return _ChoosePicture;
+            }
         }
     }
 }
