@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="PicDB.PictureList"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d">
+    <ItemsControl ItemsSource="{Binding List}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel>
+                    <Button Command="{Binding DataContext.ChoosePicture, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}}"  CommandParameter="{Binding FileName}">
+                        <Image MaxWidth="150" MaxHeight="150" Source="{Binding Thumbnail}"></Image>
+                    </Button>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>
