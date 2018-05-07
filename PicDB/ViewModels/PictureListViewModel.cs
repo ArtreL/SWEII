@@ -1,5 +1,7 @@
 ﻿using BIF.SWE2.Interfaces.ViewModels;
+using PicDB.Layers;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PicDB.ViewModels
 {
@@ -9,7 +11,7 @@ namespace PicDB.ViewModels
         {
             List<IPictureViewModel> picvmdls = new List<IPictureViewModel>();
 
-            foreach(var pic in MainWindowViewModel.BL.GetPictures())
+            foreach(var pic in BusinessLayer.GetInstance().GetPictures())
             {
                 picvmdls.Add(new PictureViewModel(pic));
             }

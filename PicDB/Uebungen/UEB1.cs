@@ -22,12 +22,12 @@ namespace Uebungen
 
         public IDataAccessLayer GetAnyDataAccessLayer()
         {
-            return new DataAccessLayer();
+            return DataAccessLayer.GetInstance();
         }
 
         public IBusinessLayer GetBusinessLayer()
         {
-            return new BusinessLayer();
+            return BusinessLayer.GetInstance();
         }
 
         public BIF.SWE2.Interfaces.Models.IEXIFModel GetEmptyEXIFModel()

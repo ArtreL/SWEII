@@ -62,7 +62,9 @@
     <Compile Include="Layers\BusinessLayer.cs" />
     <Compile Include="Layers\DataAccessLayer.cs" />
     <Compile Include="Models\CameraModel.cs" />
+    <Compile Include="Models\EXIFGenerator.cs" />
     <Compile Include="Models\EXIFModel.cs" />
+    <Compile Include="Models\IPTCGenerator.cs" />
     <Compile Include="Models\IPTCModel.cs" />
     <Compile Include="Models\PhotographerModel.cs" />
     <Compile Include="Models\PictureModel.cs" />

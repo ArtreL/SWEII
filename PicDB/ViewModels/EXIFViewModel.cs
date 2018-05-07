@@ -1,8 +1,4 @@
 ﻿using BIF.SWE2.Interfaces.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BIF.SWE2.Interfaces;
 using BIF.SWE2.Interfaces.Models;
 
@@ -20,7 +16,8 @@ namespace PicDB.ViewModels
                 ISOValue = exif.ISOValue;
                 Flash = exif.Flash;
                 ExposureProgram = exif.ExposureProgram.ToString();
-                ExposureProgramResource = "Hugo";
+                ExposureProgramResource = "RRFE";
+                ISORatingResource = "";
             }
         }
 

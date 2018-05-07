@@ -16,8 +16,23 @@ namespace PicDB.Layers
 {
     public class BusinessLayer : IBusinessLayer
     {
+        private static BusinessLayer _Instance = null;
+
+        protected BusinessLayer() { }
+
+        public static BusinessLayer GetInstance()
+        {
+            if(_Instance == null)
+            {
+                _Instance = new BusinessLayer();
+            }
+
+            return _Instance;
+        }
+
         private List<IPictureModel> PictureList = new List<IPictureModel>();
         private List<IPhotographerModel> PhotographerList = new List<IPhotographerModel>();
+        private List<ICameraModel> CameraList = new List<ICameraModel>();
         private readonly string folderpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Pictures";
         private readonly List<string> MetadataTags = new List<string>
         {
@@ -28,6 +43,7 @@ namespace PicDB.Layers
             "0x9209",
             "0x8822"
         };
+
 
         public void DeletePhotographer(int ID)
         {
@@ -113,45 +129,24 @@ namespace PicDB.Layers
 
         public ICameraModel GetCamera(int cam_id)
         {
-            return new CameraModel
-            {
-                ID = cam_id,
-                Producer = "Unnecessary"
-            };
+            return CameraList.Where(cam => cam.ID == cam_id).Single();
         }
 
         public IEnumerable<ICameraModel> GetCameras()
         {
-            return new List<ICameraModel>
-            {
-                new CameraModel
-                {
-                    Producer = "Canon"
-                },
-                new CameraModel
-                {
-                    Producer = "Nintendo"
-                }
-            };
+            CameraList = DataAccessLayer.GetInstance().GetCameras().ToList();
+
+            return CameraList;
         }
 
         public IPhotographerModel GetPhotographer(int photog_id)
         {
-            return new PhotographerModel
-            {
-                ID = photog_id,
-                FirstName = "Unnecessary",
-                LastName = "For Real"
-            };
+            return PhotographerList.Where(photog => photog.ID == photog_id).Single();
         }
 
         public IEnumerable<IPhotographerModel> GetPhotographers()
         {
-            PhotographerList.Add(new PhotographerModel
-            {
-                FirstName = "Lorem",
-                LastName = "Ipsum"
-            });
+            PhotographerList = DataAccessLayer.GetInstance().GetPhotographers().ToList();
 
             return PhotographerList;
         }
@@ -237,6 +232,9 @@ namespace PicDB.Layers
 
         public void Sync()
         {
+            GetCameras();
+            GetPhotographers();
+
             string[] files = new string[] { };
 
             files = Directory.GetFileSystemEntries(folderpath);
@@ -245,199 +243,19 @@ namespace PicDB.Layers
             {
                 string filename_split = file.Split('\\').Last();
                 int pic_id = 0;
-                string sql_error = null;
 
-                #region Extract EXIF
-                Image SaveImage = null;
-
-                string id = "";
-                int length = 0;
-                short type = 0;
-                string exifmake = "";
-                decimal exiffnumber = 0;
-                decimal exifexposuretime = 0;
-                decimal exifisovalue = 0;
-                bool exifflash = false;
-                int exifexposureprogram = 0;
-                List<byte> exifvaluebytes = new List<byte>();
-
-                using (Image theImage = new Bitmap(file))
-                {
-                    SaveImage = new Bitmap(theImage);
-                    PropertyItem[] propItems = theImage.PropertyItems;
-
-                    foreach (var item in propItems)
-                    {
-                        id = "0x" + item.Id.ToString("X4");
-
-                        if (MetadataTags.Contains(id))
-                        {
-                            length = item.Len;
-                            type = item.Type;
-                            exifvaluebytes.Clear();
-
-                            switch (id)
-                            {
-                                case "0x010F": // Make,
-                                    for (int i = 0; i < (length - 1); ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exifmake = Encoding.UTF8.GetString(exifvaluebytes.ToArray());
-                                    break;
-                                case "0x8822": // Exposure Program
-                                    for (int i = 0; i < length; ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exifexposureprogram = BitConverter.ToUInt16(exifvaluebytes.ToArray(), 0);
-                                    break;
-                                case "0x8827": // ISO Value
-                                    for (int i = 0; i < length; ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exifisovalue = BitConverter.ToUInt16(exifvaluebytes.ToArray(), 0);
-                                    break;
-                                case "0x9209": // Flash
-                                    for (int i = 0; i < length; ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exifflash = BitConverter.ToUInt16(exifvaluebytes.ToArray(), 0) == 16;
-                                    break;
-                                case "0x829A": // Exposure Time
-                                    for (int i = 0; i < (length / 2); ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    decimal exptim_numerator = BitConverter.ToUInt32(exifvaluebytes.ToArray(), 0);
-                                    exifvaluebytes.Clear();
-
-                                    for (int i = (length / 2); i < length; ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exifexposuretime = exptim_numerator / BitConverter.ToUInt32(exifvaluebytes.ToArray(), 0);
-                                    break;
-                                case "0x829D": // FNumber
-                                    for (int i = 0; i < (length / 2); ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    decimal fnum_numerator = BitConverter.ToUInt32(exifvaluebytes.ToArray(), 0);
-                                    exifvaluebytes.Clear();
-
-                                    for (int i = (length / 2); i < length; ++i)
-                                    {
-                                        exifvaluebytes.Add(item.Value[i]);
-                                    }
-
-                                    exiffnumber = fnum_numerator / BitConverter.ToUInt32(exifvaluebytes.ToArray(), 0);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    }
-
-                    //SetProperty(ref propItems[0], 0x010F, "Blunderbuss");
-                    //theImage.SetPropertyItem(propItems[0]);
-
-                    //foreach (var item in propItems)
-                    //{
-                    //    SaveImage.SetPropertyItem(item);
-                    //}
-                }
-
-                //ImageCodecInfo myImageCodecInfo = GetEncoder(ImageFormat.Jpeg);
-                //System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                //SaveImage.Save(file, myImageCodecInfo, null);
-                #endregion
-
-                #region Extract IPTC
-                //var stream = new FileStream(file, FileMode.Open, FileAccess.Read);
-                //var decoder = new JpegBitmapDecoder(stream, BitmapCreateOptions.None, BitmapCacheOption.None);
-                //var metadata = decoder.Frames[0].Metadata as BitmapMetadata;
-                #endregion
-
-                using (SqlConnection db = new SqlConnection(@"Data Source=(local); Initial Catalog=PicDB; Integrated Security=true;"))
-                {
-                    int exif_id = 0;
-
-                    db.Open();
-
-                    SqlCommand query = new SqlCommand(@"P_INSERT_EXIF @Make, @FNumber, @ExposureTime, @Flash, @ExposureProgram", db);
-
-                    query.Parameters.AddWithValue("@Make", exifmake);
-                    query.Parameters.AddWithValue("@FNumber", exiffnumber);
-                    query.Parameters.AddWithValue("@ExposureTime", exifexposuretime);
-                    query.Parameters.AddWithValue("@Flash", exifflash);
-                    query.Parameters.AddWithValue("@ExposureProgram", exifexposureprogram);
-
-                    query.ExecuteNonQuery();
-
-                    using (SqlDataReader rd = query.ExecuteReader())
-                    {
-                        while (rd.Read())
-                        {
-                            try
-                            {
-                                exif_id = rd.GetInt32(0);
-                            }
-                            catch
-                            {
-                                sql_error = rd.GetString(0);
-                            }
-                        }
-                    }
-
-                    db.Close();
-                    db.Open();
-
-                    query = new SqlCommand(@"P_INSERT_Picture @FileName, @PhotogId, @CameraId, @EXIFId, @IPTCId", db);
-
-                    Random rnd = new Random();
-
-                    query.Parameters.AddWithValue("@FileName", filename_split);
-                    query.Parameters.AddWithValue("@PhotogId", rnd.Next(1, 4));
-                    query.Parameters.AddWithValue("@CameraId", rnd.Next(1, 4));
-                    query.Parameters.AddWithValue("@EXIFId", exif_id);
-                    query.Parameters.AddWithValue("@IPTCId", 0);
-
-                    query.ExecuteNonQuery();
-
-                    using (SqlDataReader rd = query.ExecuteReader())
-                    {
-                        while (rd.Read())
-                        {
-                            try
-                            {
-                                pic_id = rd.GetInt32(0);
-                            }
-                            catch
-                            {
-                                sql_error = rd.GetString(0);
-                            }
-                        }
-                    }
-
-                    db.Close();
-                }
+                string exifmake = EXIFGenerator.Get().Make;
+                decimal exiffnumber = EXIFGenerator.Get().FNumber;
+                decimal exifexposuretime = EXIFGenerator.Get().ExposureTime;
+                bool exifflash = EXIFGenerator.Get().Flash;
+                ExposurePrograms exifexposureprogram = EXIFGenerator.Get().ExposureProgram;
 
                 #region Create Thumbnail
                 if (!File.Exists(file.Replace("\\Pictures\\", "\\Thumbnails\\")))
                 {
                     Image image = new Bitmap(file);
-                    int width = 180;
-                    int height = 180;
+                    int width = 100;
+                    int height = 100;
                     var destRect = new Rectangle(0, 0, width, height);
                     var destImage = new Bitmap(width, height);
 
@@ -464,7 +282,7 @@ namespace PicDB.Layers
 
                 if (PictureList.Where(x => x.FileName == filename_split).FirstOrDefault() == null)
                 {
-                    PictureList.Add(new PictureModel
+                    IPictureModel newpicture = new PictureModel
                     {
                         ID = pic_id,
                         FileName = filename_split,
@@ -474,12 +292,18 @@ namespace PicDB.Layers
                             Make = exifmake,
                             FNumber = exiffnumber,
                             ExposureTime = exifexposuretime,
-                            ISOValue = exifisovalue,
+                            ISOValue = EXIFGenerator.Get().ISOValue,
                             Flash = exifflash,
-                            ExposureProgram = (ExposurePrograms)exifexposureprogram
+                            ExposureProgram = exifexposureprogram
                         },
                         Camera = null
-                    });
+                    };
+
+                    DataAccessLayer.GetInstance().Save(newpicture);
+
+                    newpicture.ID = DataAccessLayer.GetInstance().LastSavedPictureID;
+
+                    PictureList.Add(newpicture);
                 }
             }
         }

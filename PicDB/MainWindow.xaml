@@ -41,44 +41,81 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="100"/>
                     <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="*" MinWidth="100"/>
+                    <ColumnDefinition Width="*" MinWidth="220"/>
                 </Grid.ColumnDefinitions>
-                <Border HorizontalAlignment="Center">
+                <Border HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ScrollViewer>
                         <Image DataContext="{Binding CurrentPicture}" Source="{Binding FilePath}"></Image>
                     </ScrollViewer>
                 </Border>
                 <GridSplitter Grid.Column="1" Width="10" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Columns"/>
-                <Border Grid.Column="2" HorizontalAlignment="Stretch">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Command="{Binding IPTCButton}">IPTC</Button>
-                            <Button Grid.Column="1" Command="{Binding EXIFButton}">EXIF</Button>
-                        </Grid>
-                        <ComboBox Grid.Row="1">
-
-                        </ComboBox>
-                        <TextBox Grid.Row="2"/>
-                        <TextBox Grid.Row="3"/>
-                        <Button Grid.Row="4" Command="{Binding SaveButton}">Save</Button>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Command="{Binding IPTCButton}">IPTC</Button>
+                        <Button Grid.Column="1" Command="{Binding EXIFButton}">EXIF</Button>
                     </Grid>
-                </Border>
+                    <!-- EXIF Data -->
+                    <UniformGrid Grid.Row="1" Visibility="{Binding DisplayEXIF, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Make:"/>
+                            <TextBlock Text="F-Number:"/>
+                            <TextBlock Text="Exposure Time:"/>
+                            <TextBlock Text="ISO Value:"/>
+                            <TextBlock Text="Flash"/>
+                            <TextBlock Text="Exposure Program:"/>
+                            <TextBlock Text="ExP Resource:"/>
+                            <TextBlock Text="Camera Producer:"/>
+                            <TextBlock Text="Camera Make:"/>
+                            <TextBlock Text="Camera Bought-On:"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" DataContext="{Binding CurrentPicture.EXIF}">
+                            <TextBlock Text="{Binding Make}"/>
+                            <TextBlock Text="{Binding FNumber}"/>
+                            <TextBlock Text="{Binding ExposureTime}"/>
+                            <TextBlock Text="{Binding ISOValue}"/>
+                            <TextBlock Text="{Binding Flash}"/>
+                            <TextBlock Text="{Binding ExposureProgram}"/>
+                            <TextBlock Text="{Binding ExposureProgramResource}"/>
+                            <TextBlock Text="{Binding Camera.Producer}"/>
+                            <TextBlock Text="{Binding Camera.Make}"/>
+                            <TextBlock Text="{Binding Camera.BoughtOn}"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    <!-- IPTC Data -->
+                    <UniformGrid Grid.Row="1" Visibility="{Binding DisplayIPTC, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Grid.Column="0" Grid.Row="0">
+                            <TextBlock Text="Keywords:"/>
+                            <TextBlock Text="ByLine:"/>
+                            <TextBlock Text="Copyright-Notice:"/>
+                            <TextBlock Text="Headline:"/>
+                            <TextBlock Text="Caption"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Grid.Row="0" DataContext="{Binding CurrentPicture.IPTC}">
+                            <TextBox Text="{Binding Keywords}"/>
+                            <TextBox Text="{Binding ByLine}"/>
+                            <TextBox Text="{Binding CopyrightNotice}"/>
+                            <TextBox Text="{Binding HeadLine}"/>
+                            <TextBox Text="{Binding Caption}"/>
+                            <Button>Save</Button>
+                        </StackPanel>
+                    </UniformGrid>
+                </Grid>
             </Grid>
         </DockPanel>
         <!--<GridSplitter Grid.Row="1" Height="10" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" ResizeDirection="Rows"/>-->
         <!-- Embedded PictureList -->
-        <ScrollViewer Grid.Row="2" DockPanel.Dock="Bottom" HorizontalScrollBarVisibility="Auto" Height="Auto">
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" Height="Auto">
             <ContentControl Content="{Binding List}"/>
         </ScrollViewer>
     </Grid>
